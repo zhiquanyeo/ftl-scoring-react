@@ -1,7 +1,7 @@
 import { ADD_MATCH, DELETE_MATCH, SET_ACTIVE_MATCH, REFRESH_TOURNAMENT_INFO } from '../actions/matchActions';
 
 const initialState = {
-    activeMatch: 'Test',
+    activeMatch: null,
     matchList: [],
 };
 
@@ -28,6 +28,7 @@ export default(state = initialState, action) => {
                 matchList: newMatchList
             };
         case SET_ACTIVE_MATCH:
+            console.log('set active match: ', payload);
             return {
                 activeMatch: payload.matchName,
                 ...state

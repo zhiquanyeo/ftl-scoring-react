@@ -2,9 +2,14 @@ import React, { Component } from 'react';
 import { Table, Button, ButtonToolbar } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import ScoreUtil from '../utils/scoreUtil';
+import {setActiveMatch} from '../actions/matchActions';
 
 class MatchAdminList extends Component {
+    onActivateEvent(matchName, e) {
+        console.log('handleActivateMatch');
+        this.props.handleActivateMatch(matchName);
+    }
+
     render() {
         var matchList = this.props.matchList || [];
         var matchListElements;
@@ -17,9 +22,11 @@ class MatchAdminList extends Component {
         else {
             matchListElements = matchList.map((matchInfo) => {
                 var activeClassName = (matchInfo.matchName === this.props.activeMatch) ? "active-match" : null;
+                var btnDisabled = !canActivate && matchInfo.state !== 'COMPLETE';
                 return (
                     <tr key={matchInfo.matchName} className={activeClassName}>
                         <td>{matchInfo.matchName}</td>
+                        <td>{matchInfo.state}</td>
                         <td className="red-team">{matchInfo.redTeams[0] || 'EMPTY'}</td>
                         <td className="red-team">{matchInfo.redTeams[1] || 'EMPTY'}</td>
                         <td className="blue-team">{matchInfo.blueTeams[0] || 'EMPTY'}</td>
@@ -27,7 +34,7 @@ class MatchAdminList extends Component {
                         <td>
                             <ButtonToolbar>
                                 <Button bsStyle="danger" bsSize="xsmall">Delete</Button>
-                                <Button disabled={!canActivate && matchInfo.state !== 'COMPLETE'} bsStyle="success" bsSize="xsmall">Activate</Button>
+                                <Button disabled={btnDisabled} bsStyle="success" bsSize="xsmall" onClick={(e) => this.onActivateEvent(matchInfo.matchName)}>Activate</Button>
                             </ButtonToolbar>
                         </td>
                     </tr>
@@ -40,6 +47,7 @@ class MatchAdminList extends Component {
                 <thead>
                     <tr>
                         <th>Match</th>
+                        <th>State</th>
                         <th colSpan={2} className='red-team'>Red Teams</th>
                         <th colSpan={2} className='blue-team'>Blue Teams</th>
                         <th>&nbsp;</th>
@@ -60,4 +68,13 @@ const mapStateToProps = (state, props) => {
     }
 }
 
-export default connect(mapStateToProps)(MatchAdminList);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        handleActivateMatch: (matchName) => {
+            console.log('dispatching');
+            dispatch(setActiveMatch(matchName));
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MatchAdminList);

@@ -9,8 +9,9 @@ import MatchUtil from '../utils/matchUtil';
 
 class AdminView extends Component {
     render() {
+        console.log('admin view render', this.props);
         var activeMatch = MatchUtil.getActiveMatch(this.props.tournamentInfo);
-
+        console.log('activeMAtch: ', activeMatch);
         return (
             <Grid>
                 <Row>
