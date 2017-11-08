@@ -7,7 +7,7 @@ class API {
         
         // All fake data!
         this.tournamentInfo = {
-            activeMatch: null,
+            activeMatch: 'Test',
             matchList: [],
         }
     }

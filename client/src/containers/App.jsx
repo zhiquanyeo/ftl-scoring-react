@@ -15,6 +15,7 @@ class App extends Component {
         super(props);
 
         this.props.addMatch("Test", ["red1","red2"], ["blue1", "blue2"]);
+        
     }
     render () {
         return(

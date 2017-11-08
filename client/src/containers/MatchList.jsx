@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Grid, Row, Col, Table } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import ScoreUtil from '../utils/score-util';
+import ScoreUtil from '../utils/scoreUtil';
 
 class MatchList extends Component {
     render() {
