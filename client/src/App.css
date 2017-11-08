@@ -1,0 +1,15 @@
+.App {
+  text-align: center;
+}
+
+.red-team {
+  color: red;
+}
+
+.blue-team {
+  color: blue;
+}
+
+.active-match {
+  background-color: yellow !important;
+}
