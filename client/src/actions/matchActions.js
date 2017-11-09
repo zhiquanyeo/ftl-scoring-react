@@ -33,8 +33,7 @@ export const addMatch = (matchName, redTeams, blueTeams) => {
     return (dispatch, getState) => {
         request(_addMatch(matchName, redTeams, blueTeams))
         .then((resp) => {
-            console.log('resp: ', resp);
-            dispatch(refreshTournamentInfo(resp));
+            dispatch(tournamentInfoUpdated(resp));
         });
     }
 }
@@ -50,19 +49,27 @@ export const deleteMatch = (matchName) => {
 };
 
 export const SET_ACTIVE_MATCH = 'SET_ACTIVE_MATCH';
-export const setActiveMatch = (matchName) => {
+const _setActiveMatch = (matchName) => {
     return {
         type: SET_ACTIVE_MATCH,
         payload: {
             matchName: matchName
         }
     }
+}
+export const setActiveMatch = (matchName) => {
+    return (dispatch, getState) => {
+        request(_setActiveMatch(matchName))
+        .then((resp) => {
+            dispatch(tournamentInfoUpdated(resp));
+        });
+    }
 };
 
-export const REFRESH_TOURNAMENT_INFO = 'REFRESH_TOURNAMENT_INFO';
-export const refreshTournamentInfo = (tournamentInfo) => {
+export const TOURNAMENT_INFO_UPDATED = 'TOURNAMENT_INFO_UPDATED';
+export const tournamentInfoUpdated = (tournamentInfo) => {
     return {
-        type: REFRESH_TOURNAMENT_INFO,
+        type: TOURNAMENT_INFO_UPDATED,
         payload: {
             tournamentInfo: tournamentInfo
         }

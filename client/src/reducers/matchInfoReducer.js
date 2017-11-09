@@ -1,4 +1,4 @@
-import { ADD_MATCH, DELETE_MATCH, SET_ACTIVE_MATCH, REFRESH_TOURNAMENT_INFO } from '../actions/matchActions';
+import { ADD_MATCH, DELETE_MATCH, SET_ACTIVE_MATCH, TOURNAMENT_INFO_UPDATED } from '../actions/matchActions';
 
 const initialState = {
     activeMatch: null,
@@ -33,7 +33,7 @@ export default(state = initialState, action) => {
                 activeMatch: payload.matchName,
                 ...state
             }
-        case REFRESH_TOURNAMENT_INFO:
+        case TOURNAMENT_INFO_UPDATED:
             return {
                 activeMatch: payload.tournamentInfo.activeMatch,
                 matchList: payload.tournamentInfo.matchList
