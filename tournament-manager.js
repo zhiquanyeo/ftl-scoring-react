@@ -110,6 +110,9 @@ class TournamentManager extends EventEmitter {
             case 'ADD_TEAM': {
                 resp = this.handleAddTeam(req, socket);
             } break;
+            case 'DELETE_TEAM': {
+                resp = this.handleDeleteTeam(req, socket);
+            } break;
         }
 
         socket.emit('response', resp);
@@ -123,8 +126,47 @@ class TournamentManager extends EventEmitter {
             resp.err = "Match '" + req.payload.matchName + "' already exists";
         }
         else {
-            this.d_matches.push(req.payload);
-            this.d_matchNameMap[req.payload.matchName] = true;
+            // TODO Verify that the teams exist
+            var redTeams = req.payload.redTeams;
+            var blueTeams = req.payload.blueTeams;
+
+            var redTeamNames = [];
+            var blueTeamNames = [];
+
+            var err = false;
+            for (var i = 0; i < redTeams.length; i++) {
+                var teamId = redTeams[i].trim();
+                if (!this.d_teams[teamId]) {
+                    err = true;
+                    redTeamNames.push('INVALID TEAM');
+                }
+                else {
+                    redTeamNames.push(this.d_teams[teamId]);
+                }
+            }
+            for (var i = 0; i < blueTeams.length; i++) {
+                var teamId = blueTeams[i].trim();
+                if (!this.d_teams[teamId]) {
+                    err = true;
+                    blueTeamNames.push('INVALID TEAM');
+                }
+                else {
+                    blueTeamNames.push(this.d_teams[teamId]);
+                }
+            }
+
+            if (err) {
+                resp.err = "Invalid Teams found";
+            }
+            else {
+                var matchObj = {
+                    matchName: req.payload.matchName,
+                    redTeams: redTeamNames,
+                    blueTeams: blueTeamNames
+                }
+                this.d_matches.push(matchObj);
+                this.d_matchNameMap[req.payload.matchName] = true;
+            }
         }
 
         resp.payload = buildTournamentInfo(this.d_activeMatch, this.d_matches);
@@ -182,6 +224,19 @@ class TournamentManager extends EventEmitter {
         else {
             this.d_teams[req.payload.id] = req.payload.name;
         }
+
+        resp.payload = this.d_teams;
+
+        // Tell the other sockets (not us)
+        socket.broadcast.emit('TEAM_LIST_UPDATED', resp.payload);
+
+        return resp;
+    }
+
+    handleDeleteTeam(req, socket) {
+        var resp = buildResponse(req);
+
+        delete this.d_teams[req.payload.id];
 
         resp.payload = this.d_teams;
 

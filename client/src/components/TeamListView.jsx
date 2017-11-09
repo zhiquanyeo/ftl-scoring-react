@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { Table, Button } from 'react-bootstrap';
 
 class TeamListView extends Component {
+    handleDeleteTeam(teamId) {
+        this.props.onDeleteTeam(teamId);
+    }
+
     render() {
         console.log(this.props);
         var teamList = this.props.teamList || {};
@@ -18,7 +22,7 @@ class TeamListView extends Component {
                         <td>{teamId}</td>
                         <td>{teamName}</td>
                         <td>
-                            <Button bsStyle="danger" bsSize="xsmall">Delete</Button>
+                            <Button bsStyle="danger" bsSize="xsmall" onClick={(e) => {this.handleDeleteTeam(teamId)}}>Delete</Button>
                         </td>
                     </tr>
                 )

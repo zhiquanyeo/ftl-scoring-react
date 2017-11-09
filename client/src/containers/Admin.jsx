@@ -10,7 +10,7 @@ import TeamListView from '../components/TeamListView';
 import MatchUtil from '../utils/matchUtil';
 
 import {addMatch} from '../actions/matchActions';
-import {addTeam} from '../actions/teamActions';
+import {addTeam, deleteTeam} from '../actions/teamActions';
 
 class AdminView extends Component {
     handleAddMatch() {
@@ -44,6 +44,10 @@ class AdminView extends Component {
         teamNameElem.value = "";
     }
 
+    handleDeleteTeam(teamId) {
+        this.props.deleteTeam(teamId);
+    }
+
     render() {
         console.log(this.props);
         var activeMatch = MatchUtil.getActiveMatch(this.props.tournamentInfo);
@@ -62,7 +66,7 @@ class AdminView extends Component {
                                 <CurrentMatchView activeMatch={activeMatch}/>
                             </Panel>
                             <Panel header="Teams" bsStyle="warning" eventKey="adminTeams">
-                                <TeamListView teamList={this.props.teamList}/>
+                                <TeamListView teamList={this.props.teamList} onDeleteTeam={this.handleDeleteTeam.bind(this)}/>
                                 <Form inline>
                                     <FormGroup>
                                         <FormControl ref={(input) => { this.addTeamId = input }} type="text" placeholder="Team ID"/>
@@ -119,6 +123,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         addTeam: (teamId, teamName) => {
             dispatch(addTeam(teamId, teamName));
+        },
+        deleteTeam: (teamId) => {
+            dispatch(deleteTeam(teamId));
         }
     }
 }

@@ -21,9 +21,8 @@ const apiActionEmitter = (store) => {
     });
 
     API.on('TEAM_LIST_UPDATED', (teamList) => {
-        console.log('received team list', teamList);
         store.dispatch(teamListUpdated(teamList));
-    })
+    });
 };
 
 export default apiActionEmitter;
