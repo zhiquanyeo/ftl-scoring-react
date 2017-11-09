@@ -8,12 +8,25 @@ import MatchAdminList from '../components/MatchAdminList';
 
 import MatchUtil from '../utils/matchUtil';
 
+import {addMatch} from '../actions/matchActions';
+
 class AdminView extends Component {
     handleAddMatch() {
+        console.log('this.props ', this.props);
         var matchNameElem = ReactDOM.findDOMNode(this.addMatchName);
         var redTeamsElem = ReactDOM.findDOMNode(this.addRedTeams);
         var blueTeamsElem = ReactDOM.findDOMNode(this.addBlueTeams);
         console.log('Match Name: ', matchNameElem.value);
+
+        var matchName = matchNameElem.value;
+        var redTeams = redTeamsElem.value.split(';');
+        var blueTeams = blueTeamsElem.value.split(';');
+        // Add the match and clear out the values
+        this.props.addMatch(matchName, redTeams, blueTeams);
+
+        matchNameElem.value = "";
+        redTeamsElem.value = "";
+        blueTeamsElem.value = "";
     }
 
     render() {
@@ -68,4 +81,12 @@ const mapStateToProps = (state, props) => {
     }
 }
 
-export default connect(mapStateToProps)(AdminView);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        addMatch: (matchName, redTeams, blueTeams) => {
+            dispatch(addMatch(matchName, redTeams, blueTeams));
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AdminView);

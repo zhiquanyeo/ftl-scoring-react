@@ -8,14 +8,9 @@ import MatchDisplay from './MatchDisplay';
 import Rankings from './Rankings';
 import ScoringPanel from './ScoringPanel'; 
 
-import {addMatch} from '../actions/matchActions';
-
 class App extends Component {
     constructor(props) {
         super(props);
-
-        this.props.addMatch("Test", ["red1","red2"], ["blue1", "blue2"]);
-        
     }
     render () {
         return(
@@ -37,12 +32,4 @@ const mapStateToProps = (state, ownProps) => {
     }
 };
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        addMatch: (matchName, redTeams, blueTeams) => {
-            dispatch(addMatch(matchName, redTeams, blueTeams));
-        }
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps)(App);

@@ -9,6 +9,7 @@ class API {
 
         this.socket.on('response', (resp) => {
             // resp is { messageId, err, payload }
+            // Forward the response along
             this.emit('response', resp, resp.messageId, resp.err, resp.payload);
         });
 
