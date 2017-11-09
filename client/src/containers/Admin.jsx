@@ -5,10 +5,12 @@ import { connect } from 'react-redux';
 
 import CurrentMatchView from '../components/CurrentMatchView'
 import MatchAdminList from '../components/MatchAdminList';
+import TeamListView from '../components/TeamListView';
 
 import MatchUtil from '../utils/matchUtil';
 
 import {addMatch} from '../actions/matchActions';
+import {addTeam} from '../actions/teamActions';
 
 class AdminView extends Component {
     handleAddMatch() {
@@ -29,7 +31,21 @@ class AdminView extends Component {
         blueTeamsElem.value = "";
     }
 
+    handleAddTeam() {
+        var teamIdElem = ReactDOM.findDOMNode(this.addTeamId);
+        var teamNameElem = ReactDOM.findDOMNode(this.addTeamName);
+
+        var teamId = teamIdElem.value;
+        var teamName = teamNameElem.value;
+
+        this.props.addTeam(teamId, teamName);
+
+        teamIdElem.value = "";
+        teamNameElem.value = "";
+    }
+
     render() {
+        console.log(this.props);
         var activeMatch = MatchUtil.getActiveMatch(this.props.tournamentInfo);
         
         return (
@@ -45,7 +61,20 @@ class AdminView extends Component {
                             <Panel header="Current Match" bsStyle="primary" eventKey="adminCurrMatch">
                                 <CurrentMatchView activeMatch={activeMatch}/>
                             </Panel>
-                            <Panel header="Teams" bsStyle="warning" eventKey="adminTeams">Teams</Panel>
+                            <Panel header="Teams" bsStyle="warning" eventKey="adminTeams">
+                                <TeamListView teamList={this.props.teamList}/>
+                                <Form inline>
+                                    <FormGroup>
+                                        <FormControl ref={(input) => { this.addTeamId = input }} type="text" placeholder="Team ID"/>
+                                    </FormGroup>
+                                    {' '}
+                                    <FormGroup>
+                                        <FormControl ref={(input) => { this.addTeamName = input }} type="text" placeholder="Team Name"/>
+                                    </FormGroup>
+                                    {' '}
+                                    <Button bsStyle="primary" onClick={(e) => this.handleAddTeam() }>Add Team</Button>
+                                </Form>
+                            </Panel>
                             <Panel header="Matches" bsStyle="success" eventKey="adminMatches">
                                 <MatchAdminList />
                                 <Form inline>
@@ -73,11 +102,13 @@ class AdminView extends Component {
 };
 
 const mapStateToProps = (state, props) => {
+    console.log('hi ', state);
     return {
         tournamentInfo: {
             activeMatch: state.matchInfo.activeMatch,
             matchList: state.matchInfo.matchList
-        }
+        },
+        teamList: state.teamList.teams
     }
 }
 
@@ -85,6 +116,9 @@ const mapDispatchToProps = (dispatch) => {
     return {
         addMatch: (matchName, redTeams, blueTeams) => {
             dispatch(addMatch(matchName, redTeams, blueTeams));
+        },
+        addTeam: (teamId, teamName) => {
+            dispatch(addTeam(teamId, teamName));
         }
     }
 }

@@ -16,7 +16,11 @@ class API {
         // Out of band comms
         this.socket.on('TOURNAMENT_INFO_UPDATED', (tInfo) => {
             this.emit('TOURNAMENT_INFO_UPDATED', tInfo);
-        })
+        });
+
+        this.socket.on('TEAM_LIST_UPDATED', (teamList) => {
+            this.emit('TEAM_LIST_UPDATED', teamList);
+        });
     }
 
     send(topic, id, channel, data) {

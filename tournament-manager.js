@@ -73,6 +73,7 @@ class TournamentManager extends EventEmitter {
 
         // Send the new clients a status update
         socket.emit('TOURNAMENT_INFO_UPDATED', buildTournamentInfo(this.d_activeMatch, this.d_matches));
+        socket.emit('TEAM_LIST_UPDATED', this.d_teams);
     }
 
     unregisterClient (socket) {
@@ -105,6 +106,9 @@ class TournamentManager extends EventEmitter {
             } break;
             case 'ADD_TELEOP_POINTS': {
                 resp = this.handleAddTeleopPoints(req, socket);
+            } break;
+            case 'ADD_TEAM': {
+                resp = this.handleAddTeam(req, socket);
             } break;
         }
 
@@ -165,6 +169,24 @@ class TournamentManager extends EventEmitter {
 
         // Tell the other sockets (not us)
         socket.broadcast.emit('TOURNAMENT_INFO_UPDATED', resp.payload);
+
+        return resp;
+    }
+
+    handleAddTeam(req, socket) {
+        var resp = buildResponse(req);
+
+        if (this.d_teams[req.payload.id]) {
+            resp.err = "Team ID '" + req.payload.id + "' already exists";
+        }
+        else {
+            this.d_teams[req.payload.id] = req.payload.name;
+        }
+
+        resp.payload = this.d_teams;
+
+        // Tell the other sockets (not us)
+        socket.broadcast.emit('TEAM_LIST_UPDATED', resp.payload);
 
         return resp;
     }
