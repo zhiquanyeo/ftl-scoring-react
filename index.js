@@ -62,10 +62,10 @@ var serverPort = process.env.PORT || 3001;
 // Set up the server port
 app.set('port', serverPort);
 
-app.use(express.static(path.join(__dirname, 'client', 'build')));
+app.use(express.static(path.join('client', 'build')));
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client','build','index.html'));
+    res.sendFile(path.join('client','build','index.html'));
 })
 
 const TournamentManager = require('./tournament-manager');
