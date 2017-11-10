@@ -223,7 +223,7 @@ class TournamentManager extends EventEmitter {
                 this.d_matchNameMap[req.payload.matchName] = true;
 
                 // Emit an event so that the main file can persist this to DB
-                this.emit('addMatch', matchObj, redTeams, blueTeams);
+                this.emit('addMatch', matchObj, redTeams, blueTeams, req.payload.shouldScore);
             }
         }
 

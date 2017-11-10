@@ -223,6 +223,12 @@ sequelize
             });
 
             tournamentManager.on('deleteTeam', (id) => {
+                MatchRole.destroy({
+                    where: {
+                        team_id: id
+                    }
+                });
+                
                 Team.destroy({
                     where: {
                         id: id

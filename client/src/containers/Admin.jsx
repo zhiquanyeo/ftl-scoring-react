@@ -23,6 +23,7 @@ class AdminView extends Component {
         var matchName = matchNameElem.value;
         var redTeams = redTeamsElem.value.split(';');
         var blueTeams = blueTeamsElem.value.split(';');
+
         var shouldScoreMatch = scoreMatchElem.checked;
 
         // Add the match and clear out the values
@@ -114,7 +115,7 @@ class AdminView extends Component {
                                     </FormGroup>
                                     {' '}
                                     <FormGroup>
-                                        <Checkbox ref={(input) => { this.addScoreMatch = input; }} checked>Score Match</Checkbox>
+                                        <Checkbox inputRef={(input) => { this.addScoreMatch = input; }}>Score Match</Checkbox>
                                     </FormGroup>
                                     {' '}
                                     <Button bsStyle="primary" onClick={(e) => this.handleAddMatch() }>Add Match</Button>

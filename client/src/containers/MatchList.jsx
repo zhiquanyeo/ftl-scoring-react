@@ -13,7 +13,6 @@ class MatchList extends Component {
         }
         else {
             matchListElements = matchList.map((matchInfo) => {
-                console.log(matchInfo);
                 var scores = ScoreUtil.calculateScores(matchInfo);
                 var activeClassName = (matchInfo.matchName === this.props.activeMatch) ? "active-match" : null;
                 return (
