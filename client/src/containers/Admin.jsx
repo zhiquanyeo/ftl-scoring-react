@@ -11,7 +11,7 @@ import MatchUtil from '../utils/matchUtil';
 
 import {addMatch} from '../actions/matchActions';
 import {addTeam, deleteTeam} from '../actions/teamActions';
-import {startMatchMode} from '../actions/currentMatchActions';
+import {startMatchMode, addAdjustmentPoints, commitScore} from '../actions/currentMatchActions';
 
 class AdminView extends Component {
     handleAddMatch() {
@@ -51,6 +51,14 @@ class AdminView extends Component {
         this.props.startMatchMode(matchName, mode);
     }
 
+    handleScoreAdjust(matchName, side, points, description) {
+        this.props.adjustScore(matchName, side, points, description);
+    }
+
+    handleCommitScore(matchName) {
+        this.props.commitScore(matchName);
+    }
+
     render() {
         var activeMatch = MatchUtil.getActiveMatch(this.props.tournamentInfo);
         
@@ -65,7 +73,12 @@ class AdminView extends Component {
                     <Col md={12}>
                         <PanelGroup defaultActiveKey="adminCurrMatch">
                             <Panel header="Current Match" bsStyle="primary" eventKey="adminCurrMatch">
-                                <CurrentMatchView matchTimeRemaining={this.props.matchTimeRemaining} activeMatch={activeMatch} onStartMode={this.handleStartMode.bind(this)}/>
+                                <CurrentMatchView currentScores={this.props.currentScores} 
+                                        matchTimeRemaining={this.props.matchTimeRemaining} 
+                                        activeMatch={activeMatch} 
+                                        onStartMode={this.handleStartMode.bind(this)} 
+                                        onScoreAdjust={this.handleScoreAdjust.bind(this)}
+                                        onCommitScore={this.handleCommitScore.bind(this)}/>
                             </Panel>
                             <Panel header="Teams" bsStyle="warning" eventKey="adminTeams">
                                 <TeamListView teamList={this.props.teamList} onDeleteTeam={this.handleDeleteTeam.bind(this)}/>
@@ -114,7 +127,8 @@ const mapStateToProps = (state, props) => {
             matchList: state.matchInfo.matchList
         },
         teamList: state.teamList.teams,
-        matchTimeRemaining: state.currentMatchTime.timeRemaining
+        matchTimeRemaining: state.currentMatchTime.timeRemaining,
+        currentScores: state.currentMatch.points
     }
 }
 
@@ -131,6 +145,12 @@ const mapDispatchToProps = (dispatch) => {
         },
         startMatchMode: (matchName, mode) => {
             dispatch(startMatchMode(matchName, mode));
+        },
+        adjustScore: (matchName, side, points, description) => {
+            dispatch(addAdjustmentPoints(matchName, side, points, description));
+        },
+        commitScore: (matchName) => {
+            dispatch(commitScore(matchName));
         }
     }
 }

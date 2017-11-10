@@ -134,6 +134,9 @@ class TournamentManager extends EventEmitter {
             case 'ADD_TELEOP_POINTS': {
                 resp = this.handleAddTeleopPoints(req, socket);
             } break;
+            case 'ADD_ADJUSTMENT_POINTS': {
+                resp = this.handleAddAdjustmentPoints(req, socket);
+            } break;
             case 'ADD_TEAM': {
                 resp = this.handleAddTeam(req, socket);
             } break;
@@ -142,6 +145,9 @@ class TournamentManager extends EventEmitter {
             } break;
             case 'START_MATCH_MODE': {
                 resp = this.handleStartMatchMode(req, socket);
+            } break;
+            case 'COMMIT_SCORE': {
+                resp = this.handleCommitScore(req, socket);
             } break;
         }
 
@@ -425,6 +431,68 @@ class TournamentManager extends EventEmitter {
 
         socket.broadcast.emit('CURRENT_MATCH_POINTS_UPDATED', resp.payload);
         this.broadcast('TOURNAMENT_INFO_UPDATED', buildTournamentInfo(this.d_activeMatch, this.d_matches));
+
+        return resp;
+    }
+
+    handleAddAdjustmentPoints(req, socket) {
+        var resp = buildResponse(req);
+        
+        var side = req.payload.side;
+        if (!req.payload.matchName) {
+            resp.err = "No match selected";
+        }
+        else if (req.payload.matchName !== this.d_activeMatch) {
+            resp.err = "Scoring request received for incorrect match '" + req.payload.matchName + "'";
+        }
+        else if (side !== 'red' && side !== 'blue') {
+            resp.err = "Invalid side '" + req.payload.side + "'";
+        }
+        else {
+            var currOthersScore = this.d_currentMatchScore.points[side].others;
+            currOthersScore += req.payload.points;
+            this.d_currentMatchScore.points[side].others = currOthersScore;
+            
+            var matchInfo;
+            for (var i = 0; i < this.d_matches.length; i++) {
+                if (this.d_matches[i].matchName === req.payload.matchName) {
+                    matchInfo = this.d_matches[i];
+                    break;
+                }
+            }
+
+            if (matchInfo) {
+                matchInfo.scores[side].others = currOthersScore;
+            }
+        }
+
+        resp.payload = this.d_currentMatchScore;
+
+        socket.broadcast.emit('CURRENT_MATCH_POINTS_UPDATED', resp.payload);
+        this.broadcast('TOURNAMENT_INFO_UPDATED', buildTournamentInfo(this.d_activeMatch, this.d_matches));
+
+        return resp;
+    }
+
+    handleCommitScore(req, socket) {
+        var resp = buildResponse(req);
+        // Get the match scores and write them to the DB
+        if (!req.payload.matchName) {
+            resp.err = "No match selected";
+        }
+        else {
+            var matchInfo;
+            for (var i = 0; i < this.d_matches.length; i++) {
+                if (this.d_matches[i].matchName === req.payload.matchName) {
+                    matchInfo = this.d_matches[i];
+                    break;
+                }
+            }
+
+            if (matchInfo) {
+                this.emit('commitScores', matchInfo);
+            }
+        }
 
         return resp;
     }

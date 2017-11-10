@@ -3,6 +3,8 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const Sequelize = require('sequelize');
+const path = require('path');
+
 var sequelize;
 
 var env = process.env.NODE_ENV || "development";
@@ -59,6 +61,12 @@ var serverPort = process.env.PORT || 3001;
 
 // Set up the server port
 app.set('port', serverPort);
+
+app.use(express.static(path.join(__dirname, 'client', 'build')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client','build','index.html'));
+})
 
 const TournamentManager = require('./tournament-manager');
 
@@ -225,9 +233,31 @@ sequelize
                         match_id: matchName
                     }
                 });
-                
+
                 Match.destroy({
                     where: {
+                        id: matchName
+                    }
+                })
+            });
+
+            tournamentManager.on('commitScores', (matchInfo) => {
+                var scores = matchInfo.scores;
+                var matchName = matchInfo.matchName;
+                Match.update({
+                    state: 'COMPLETE',
+                    redAutoScore: scores.red.auto || 0,
+                    redTeleopScore: scores.red.teleop || 0,
+                    redOthersScore: scores.red.others || 0,
+                    redFouls: scores.red.fouls || 0,
+                    redTechFouls: scores.red.techFouls || 0,
+                    blueAutoScore: scores.blue.auto || 0,
+                    blueTeleopScore: scores.blue.teleop || 0,
+                    blueOthersScore: scores.blue.others || 0,
+                    blueFouls: scores.blue.fouls || 0,
+                    blueTechFouls: scores.blue.techFouls || 0,
+                }, {
+                    where:{
                         id: matchName
                     }
                 })

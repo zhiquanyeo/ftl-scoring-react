@@ -86,6 +86,45 @@ export const addTeleopPoints = (matchName, side, type, points, reporter) => {
     }
 }
 
+export const ADD_ADJUSTMENT_POINTS = 'ADD_ADJUSTMENT_POINTS';
+const _addAdjustmentPoints = (matchName, side, points, description) => {
+    return {
+        type: ADD_ADJUSTMENT_POINTS,
+        payload: {
+            matchName: matchName,
+            side: side,
+            points: points,
+            description: description
+        }
+    }
+}
+export const addAdjustmentPoints = (matchName, side, points, description) => {
+    return (dispatch, getState) => {
+        request(_addAdjustmentPoints(matchName, side, points, description))
+        .then((resp) => {
+            dispatch(currentMatchPointsUpdated(resp.matchName, resp.points));
+        })
+        .catch((err) => {
+            console.log('error: ', err);
+        })
+    }
+}
+
+export const COMMIT_SCORE = 'COMMIT_SCORE';
+const _commitScore = (matchName) => {
+    return {
+        type: COMMIT_SCORE,
+        payload: {
+            matchName: matchName
+        }
+    }
+}
+export const commitScore = (matchName) => {
+    return (dispatch, getState) => {
+        request(_commitScore(matchName))
+    }
+}
+
 export const CURRENT_MATCH_TIME_REMAINING_UPDATED = 'CURRENT_MATCH_TIME_REMAINING_UPDATED';
 export const currentMatchTimeRemainingUpdated = (matchName, timeRemaining) => {
     return {

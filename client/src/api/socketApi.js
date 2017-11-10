@@ -4,7 +4,8 @@ import IO from 'socket.io-client';
 class API {
     constructor() {
         // This should get changed when in prod
-        this.socket = IO.connect('http://localhost:3001');
+        // this.socket = IO.connect('http://localhost:3001');
+        this.socket = IO.connect();
 
         this.socket.on('response', (resp) => {
             // resp is { messageId, err, payload }
