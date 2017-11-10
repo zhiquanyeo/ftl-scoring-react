@@ -32,6 +32,10 @@ class API {
         this.socket.on('CURRENT_MATCH_AUTO_POINTS_UPDATED', (scores) => {
             this.emit('CURRENT_MATCH_AUTO_POINTS_UPDATED', scores);
         });
+
+        this.socket.on('CURRENT_MATCH_TIME_REMAINING_UPDATED', (tInfo) => {
+            this.emit('CURRENT_MATCH_TIME_REMAINING_UPDATED', tInfo);
+        })
     }
 
     send(topic, id, channel, data) {

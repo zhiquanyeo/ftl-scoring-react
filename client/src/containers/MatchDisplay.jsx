@@ -142,7 +142,7 @@ const mapStateToProps = (state, props) => {
         activeMatch: activeMatchName,
         matchInfo: matchInfo,
         scores: state.currentMatch.points,
-        timeRemaining: state.currentMatchTimeRemaining || 0,
+        timeRemaining: state.currentMatchTime.timeRemaining || 0,
     }
 }
 

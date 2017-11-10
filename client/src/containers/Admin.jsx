@@ -11,6 +11,7 @@ import MatchUtil from '../utils/matchUtil';
 
 import {addMatch} from '../actions/matchActions';
 import {addTeam, deleteTeam} from '../actions/teamActions';
+import {startMatchMode} from '../actions/currentMatchActions';
 
 class AdminView extends Component {
     handleAddMatch() {
@@ -46,6 +47,11 @@ class AdminView extends Component {
         this.props.deleteTeam(teamId);
     }
 
+    handleStartMode(matchName, mode) {
+        console.log('admin matchNAme: ', matchName, mode);
+        this.props.startMatchMode(matchName, mode);
+    }
+
     render() {
         var activeMatch = MatchUtil.getActiveMatch(this.props.tournamentInfo);
         
@@ -60,7 +66,7 @@ class AdminView extends Component {
                     <Col md={12}>
                         <PanelGroup defaultActiveKey="adminCurrMatch">
                             <Panel header="Current Match" bsStyle="primary" eventKey="adminCurrMatch">
-                                <CurrentMatchView activeMatch={activeMatch}/>
+                                <CurrentMatchView matchTimeRemaining={this.props.matchTimeRemaining} activeMatch={activeMatch} onStartMode={this.handleStartMode.bind(this)}/>
                             </Panel>
                             <Panel header="Teams" bsStyle="warning" eventKey="adminTeams">
                                 <TeamListView teamList={this.props.teamList} onDeleteTeam={this.handleDeleteTeam.bind(this)}/>
@@ -108,7 +114,8 @@ const mapStateToProps = (state, props) => {
             activeMatch: state.matchInfo.activeMatch,
             matchList: state.matchInfo.matchList
         },
-        teamList: state.teamList.teams
+        teamList: state.teamList.teams,
+        matchTimeRemaining: state.currentMatchTime.timeRemaining
     }
 }
 
@@ -122,6 +129,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         deleteTeam: (teamId) => {
             dispatch(deleteTeam(teamId));
+        },
+        startMatchMode: (matchName, mode) => {
+            dispatch(startMatchMode(matchName, mode));
         }
     }
 }

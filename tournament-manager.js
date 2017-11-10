@@ -46,8 +46,8 @@ class TournamentManager extends EventEmitter {
                     fouls: 0,
                     techFouls: 0,
                     autoBreakdown: [
-                        { baseline: 0, penalty: 0, goal: 0 },
-                        { baseline: 0, penalty: 0, goal: 0 },
+                        { baseline: false, penalty: false, goal: false },
+                        { baseline: false, penalty: false, goal: false },
                     ]
                 },
                 blue: {
@@ -57,8 +57,8 @@ class TournamentManager extends EventEmitter {
                     fouls: 0,
                     techFouls: 0,
                     autoBreakdown: [
-                        { baseline: 0, penalty: 0, goal: 0 },
-                        { baseline: 0, penalty: 0, goal: 0 },
+                        { baseline: false, penalty: false, goal: false },
+                        { baseline: false, penalty: false, goal: false },
                     ]
                 }
             }
@@ -92,7 +92,9 @@ class TournamentManager extends EventEmitter {
     }
 
     broadcast(evt, data) {
-
+        for (var i = 0; i < this.d_clients.length; i++) {
+            this.d_clients[i].emit(evt, data);
+        }
     }
 
     // Event handlers
@@ -119,6 +121,9 @@ class TournamentManager extends EventEmitter {
             } break;
             case 'DELETE_TEAM': {
                 resp = this.handleDeleteTeam(req, socket);
+            } break;
+            case 'START_MATCH_MODE': {
+                resp = this.handleStartMatchMode(req, socket);
             } break;
         }
 
@@ -217,7 +222,6 @@ class TournamentManager extends EventEmitter {
                 resp.err = "Invalid match name provided '" + req.payload.matchName + "'";
             }
             else {
-                console.log('matchinfo ', matchInfo);
                 // Make sure the current match is not yet started
                 if (matchInfo.state !== 'PRE_START') {
                     resp.err = "Match '" + req.payload.matchName + "' has already been started";
@@ -342,6 +346,103 @@ class TournamentManager extends EventEmitter {
 
         socket.broadcast.emit('CURRENT_MATCH_POINTS_UPDATED', resp.payload);
 
+        return resp;
+    }
+
+    handleStartMatchMode(req, socket) {
+        var resp = buildResponse(req);
+        
+        if (!req.payload.matchName) {
+            resp.err = "No match selected";
+        }
+        else if (req.payload.matchName !== this.d_activeMatch) {
+            resp.err = "Scoring request received for incorrect match '" + req.payload.matchName + "'";
+        }
+        else {
+            var matchInfo;
+            for (var i = 0; i < this.d_matches.length; i++) {
+                if (this.d_matches[i].matchName === req.payload.matchName) {
+                    matchInfo = this.d_matches[i];
+                }
+            }
+
+            if (!matchInfo) {
+                resp.err = "Invalid match name provided '" + req.payload.matchName + "'";
+            }
+            else {
+                // OK
+                // Update the current state
+                if (req.payload.mode === 'auto') {
+                    console.log('Match ' + matchInfo.matchName + ' starting AUTO');
+                    // Start autonomous mode
+                    matchInfo.state = 'AUTO';
+                    
+                    // Start the timer
+                    var currTime = Date.now();
+                    var autoInterval = setInterval(() => {
+                        var nowTime = Date.now();
+                        var timeElapsedSec = Math.floor((nowTime - currTime) / 1000);
+                        var timeRemaining = 210 - timeElapsedSec; // this is what we send down
+                        
+                        this.broadcast('CURRENT_MATCH_TIME_REMAINING_UPDATED', {
+                            matchName: matchInfo.matchName,
+                            timeRemaining: timeRemaining
+                        });
+                        if (timeElapsedSec >= 30) {
+                            clearInterval(autoInterval);
+                            matchInfo.state = 'AUTO_COMPLETE';
+                            this.broadcast('TOURNAMENT_INFO_UPDATED', buildTournamentInfo(this.d_activeMatch, this.d_matches));
+                            this.broadcast('CURRENT_MATCH_TIME_REMAINING_UPDATED', {
+                                matchName: matchInfo.matchName,
+                                timeRemaining: 180
+                            });
+
+                            console.log('AUTO complete');
+                        }
+                    }, 250);
+
+                    resp.payload = {
+                        matchName: matchInfo.matchName,
+                        timeRemaining: 210
+                    };
+                }
+                else if (req.payload.mode === 'teleop') {
+                    matchInfo.state = 'TELEOP';
+
+                    console.log('Match ' + matchInfo.matchName + ' starting TELEOP');
+
+                    var currTime = Date.now();
+                    var teleopInterval = setInterval(() => {
+                        var nowTime = Date.now();
+                        var timeElapsedSec = Math.floor((nowTime - currTime) / 1000);
+                        var timeRemaining = 180 - timeElapsedSec; // this is what we send down
+                        
+                        this.broadcast('CURRENT_MATCH_TIME_REMAINING_UPDATED', {
+                            matchName: matchInfo.matchName,
+                            timeRemaining: timeRemaining
+                        });
+                        if (timeElapsedSec >= 180) {
+                            clearInterval(teleopInterval);
+                            matchInfo.state = 'COMPLETE';
+                            this.broadcast('TOURNAMENT_INFO_UPDATED', buildTournamentInfo(this.d_activeMatch, this.d_matches));
+                            this.broadcast('CURRENT_MATCH_TIME_REMAINING_UPDATED', {
+                                matchName: matchInfo.matchName,
+                                timeRemaining: 0
+                            });
+                            console.log('TELEOP complete');
+                        }
+                    }, 250);
+
+                    resp.payload = {
+                        matchName: matchInfo.matchName,
+                        timeRemaining: 180
+                    };
+                }
+
+                // Update tournament info
+                this.broadcast('TOURNAMENT_INFO_UPDATED', buildTournamentInfo(this.d_activeMatch, this.d_matches));
+            }
+        }
         return resp;
     }
 };

@@ -91,6 +91,7 @@ export const currentMatchTimeRemainingUpdated = (matchName, timeRemaining) => {
     return {
         type: CURRENT_MATCH_TIME_REMAINING_UPDATED,
         payload: {
+            matchName: matchName,
             timeRemaining: timeRemaining
         }
     };
@@ -110,10 +111,15 @@ const _startMatchMode = (matchName, mode) => {
 
 export const startMatchMode = (matchName, mode) => {
     return (dispatch, getState) => {
+        console.log('requesting matchNAme: ', matchName);
         request(_startMatchMode(matchName, mode))
         .then((resp) => {
+            console.log('resp: ', resp);
             // resp is a timeRemaining
             dispatch(currentMatchTimeRemainingUpdated(resp.matchName, resp.timeRemaining));
-        });
+        })
+        .catch((err) => {
+            console.log('err: ',err);
+        })
     }
 }

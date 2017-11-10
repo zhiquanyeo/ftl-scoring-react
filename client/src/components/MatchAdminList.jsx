@@ -22,7 +22,7 @@ class MatchAdminList extends Component {
         else {
             matchListElements = matchList.map((matchInfo) => {
                 var activeClassName = (matchInfo.matchName === this.props.activeMatch) ? "active-match" : null;
-                var btnDisabled = !canActivate && matchInfo.state !== 'COMPLETE';
+                var btnDisabled = !canActivate && matchInfo.state !== 'PRE_START';
                 return (
                     <tr key={matchInfo.matchName} className={activeClassName}>
                         <td>{matchInfo.matchName}</td>

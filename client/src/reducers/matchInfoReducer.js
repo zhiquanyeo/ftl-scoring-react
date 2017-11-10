@@ -28,7 +28,6 @@ export default(state = initialState, action) => {
                 matchList: newMatchList
             };
         case SET_ACTIVE_MATCH:
-            console.log('set active match: ', payload);
             return {
                 activeMatch: payload.matchName,
                 ...state
