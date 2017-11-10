@@ -121,6 +121,9 @@ class TournamentManager extends EventEmitter {
             case 'ADD_MATCH': {
                 resp = this.handleAddMatch(req, socket);
             } break;
+            case 'DELETE_MATCH': {
+                resp = this.handleDeleteMatch(req, socket);
+            } break;
             case 'SET_ACTIVE_MATCH': {
                 resp = this.handleSetActiveMatch(req, socket);
                 console.log('set active match resp: ', resp);
@@ -210,12 +213,40 @@ class TournamentManager extends EventEmitter {
                 }
                 this.d_matches.push(matchObj);
                 this.d_matchNameMap[req.payload.matchName] = true;
+
+                // Emit an event so that the main file can persist this to DB
+                this.emit('addMatch', matchObj, redTeams, blueTeams);
             }
         }
 
         resp.payload = buildTournamentInfo(this.d_activeMatch, this.d_matches);
 
         // Tell the other sockets (not us)
+        socket.broadcast.emit('TOURNAMENT_INFO_UPDATED', resp.payload);
+
+        return resp;
+    }
+
+    handleDeleteMatch(req, socket) {
+        var resp = buildResponse(req);
+
+        if (!this.d_matchNameMap[req.payload.matchName]) {
+            resp.err("Invalid match name specified '" + req.payload.matchName + "'");
+        }
+        else {
+            delete this.d_matchNameMap[req.payload.matchName];
+            for (var i = 0; i < this.d_matches.length; i++) {
+                if (this.d_matches[i].matchName === req.payload.matchName) {
+                    this.d_matches.splice(i, 1);
+                    break;
+                }
+            }
+
+            this.emit('deleteMatch', req.payload.matchName);
+        }
+
+        resp.payload = buildTournamentInfo(this.d_activeMatch, this.d_matches);
+
         socket.broadcast.emit('TOURNAMENT_INFO_UPDATED', resp.payload);
 
         return resp;
@@ -267,6 +298,10 @@ class TournamentManager extends EventEmitter {
         }
         else {
             this.d_teams[req.payload.id] = req.payload.name;
+            this.emit('addTeam', {
+                id: req.payload.id,
+                name: req.payload.name
+            });
         }
 
         resp.payload = this.d_teams;
@@ -281,6 +316,7 @@ class TournamentManager extends EventEmitter {
         var resp = buildResponse(req);
 
         delete this.d_teams[req.payload.id];
+        this.emit('deleteTeam', req.payload.id);
 
         resp.payload = this.d_teams;
 

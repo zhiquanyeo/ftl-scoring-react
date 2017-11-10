@@ -48,7 +48,6 @@ class AdminView extends Component {
     }
 
     handleStartMode(matchName, mode) {
-        console.log('admin matchNAme: ', matchName, mode);
         this.props.startMatchMode(matchName, mode);
     }
 

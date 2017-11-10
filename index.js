@@ -163,6 +163,75 @@ sequelize
             // Populate the tournament manager
             console.log('Populating Tournament Manager');
             tournamentManager.populate(teamList, matchList);
+
+            // Hook up additional events
+            tournamentManager.on('addMatch', (matchObj, redTeams, blueTeams) => {
+                // Create the match
+                Match.create({
+                    id: matchObj.matchName,
+                    state: matchObj.state,
+                    redAutoScore: 0,
+                    redTeleopScore: 0,
+                    redOthersScore: 0,
+                    redFouls: 0,
+                    redTechFouls: 0,
+                    blueAutoScore: 0,
+                    blueTeleopScore: 0,
+                    blueOthersScore: 0,
+                    blueFouls: 0,
+                    blueTechFouls: 0,
+                });
+
+                // Create the match roles
+                for (var i = 0; i < redTeams.length; i++) {
+                    var redTeamId = redTeams[i].trim();
+                    MatchRole.create({
+                        match_id: matchObj.matchName,
+                        team_id: redTeamId,
+                        side: 'red',
+                        position: i
+                    });
+                }
+
+                for (var i = 0; i < blueTeams.length; i++) {
+                    var blueTeamId = blueTeams[i].trim();
+                    MatchRole.create({
+                        match_id: matchObj.matchName,
+                        team_id: blueTeamId,
+                        side: 'blue',
+                        position: i
+                    });
+                }
+            });
+
+            tournamentManager.on('addTeam', (teamInfo) => {
+                Team.create({
+                    id: teamInfo.id,
+                    name: teamInfo.name
+                });
+            });
+
+            tournamentManager.on('deleteTeam', (id) => {
+                Team.destroy({
+                    where: {
+                        id: id
+                    }
+                });
+            });
+
+            tournamentManager.on('deleteMatch', (matchName) => {
+                MatchRole.destroy({
+                    where: {
+                        match_id: matchName
+                    }
+                });
+                
+                Match.destroy({
+                    where: {
+                        id: matchName
+                    }
+                })
+            });
         })
         .catch((err) => {
             console.error('Error while getting initial data: ', err);

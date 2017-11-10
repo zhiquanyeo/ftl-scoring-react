@@ -2,12 +2,16 @@ import React, { Component } from 'react';
 import { Table, Button, ButtonToolbar } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
-import {setActiveMatch} from '../actions/matchActions';
+import {setActiveMatch, deleteMatch} from '../actions/matchActions';
 
 class MatchAdminList extends Component {
     onActivateEvent(matchName, e) {
         console.log('handleActivateMatch');
         this.props.handleActivateMatch(matchName);
+    }
+
+    onDeleteEvent(matchName) {
+        this.props.handleDeleteMatch(matchName);
     }
 
     render() {
@@ -23,7 +27,7 @@ class MatchAdminList extends Component {
             matchListElements = matchList.map((matchInfo) => {
                 var activeClassName = (matchInfo.matchName === this.props.activeMatch) ? "active-match" : null;
                 var btnDisabled = !canActivate && matchInfo.state !== 'PRE_START';
-                var deleteBtnDisabled = matchInfo.state !== 'PRE_START';
+                var deleteBtnDisabled = matchInfo.state !== 'PRE_START' || matchInfo.matchName === this.props.activeMatch;
                 return (
                     <tr key={matchInfo.matchName} className={activeClassName}>
                         <td>{matchInfo.matchName}</td>
@@ -34,7 +38,7 @@ class MatchAdminList extends Component {
                         <td className="blue-team">{matchInfo.blueTeams[1] || 'EMPTY'}</td>
                         <td>
                             <ButtonToolbar>
-                                <Button disabled={btnDisabled} bsStyle="danger" bsSize="xsmall">Delete</Button>
+                                <Button onClick={(e) => {this.onDeleteEvent(matchInfo.matchName)}} disabled={deleteBtnDisabled} bsStyle="danger" bsSize="xsmall">Delete</Button>
                                 <Button disabled={btnDisabled} bsStyle="success" bsSize="xsmall" onClick={(e) => this.onActivateEvent(matchInfo.matchName)}>Activate</Button>
                             </ButtonToolbar>
                         </td>
@@ -72,8 +76,10 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         handleActivateMatch: (matchName) => {
-            console.log('dispatching');
             dispatch(setActiveMatch(matchName));
+        },
+        handleDeleteMatch: (matchName) => {
+            dispatch(deleteMatch(matchName));
         }
     }
 }

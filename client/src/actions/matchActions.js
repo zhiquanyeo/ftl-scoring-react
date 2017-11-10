@@ -39,7 +39,7 @@ export const addMatch = (matchName, redTeams, blueTeams) => {
 }
 
 export const DELETE_MATCH = 'DELETE_MATCH';
-export const deleteMatch = (matchName) => {
+const _deleteMatch = (matchName) => {
     return {
         type: DELETE_MATCH,
         payload: {
@@ -47,6 +47,14 @@ export const deleteMatch = (matchName) => {
         }
     }
 };
+export const deleteMatch = (matchName) => {
+    return (dispatch, getState) => {
+        request(_deleteMatch(matchName))
+        .then((resp) => {
+            dispatch(tournamentInfoUpdated(resp));
+        });
+    }
+}
 
 export const SET_ACTIVE_MATCH = 'SET_ACTIVE_MATCH';
 const _setActiveMatch = (matchName) => {
