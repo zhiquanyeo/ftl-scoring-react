@@ -81,7 +81,7 @@ console.log('=== Connecting to Database ===');
 sequelize
 .authenticate()
 .then(() => {
-    sequelize.sync({force:true}).then(() => {
+    sequelize.sync().then(() => {
         // Extract the data we need first, then build state and sync with the DB
         var teamList = {};
         var matchList = [];
