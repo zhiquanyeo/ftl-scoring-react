@@ -1,7 +1,7 @@
 import request from '../api/Request';
 
 export const ADD_MATCH = 'ADD_MATCH';
-const _addMatch = (matchName, redTeams, blueTeams) => {
+const _addMatch = (matchName, redTeams, blueTeams, shouldScore) => {
     return {
         type: ADD_MATCH,
         payload: {
@@ -24,14 +24,15 @@ const _addMatch = (matchName, redTeams, blueTeams) => {
                     techFouls: 0
                 }
             },
-            state: 'PRE_START'
+            state: 'PRE_START',
+            shouldScore: shouldScore
         }
     }
 };
 
-export const addMatch = (matchName, redTeams, blueTeams) => {
+export const addMatch = (matchName, redTeams, blueTeams, shouldScore) => {
     return (dispatch, getState) => {
-        request(_addMatch(matchName, redTeams, blueTeams))
+        request(_addMatch(matchName, redTeams, blueTeams, shouldScore))
         .then((resp) => {
             dispatch(tournamentInfoUpdated(resp));
         });

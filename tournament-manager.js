@@ -215,8 +215,10 @@ class TournamentManager extends EventEmitter {
                             techFouls: 0
                         }
                     },
-                    state: 'PRE_START'
+                    state: 'PRE_START',
+                    shouldScore: req.payload.shouldScore
                 }
+                console.log('should score? ', req.payload.shouldScore);
                 this.d_matches.push(matchObj);
                 this.d_matchNameMap[req.payload.matchName] = true;
 

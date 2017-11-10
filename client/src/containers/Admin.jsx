@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { Grid, Row, Col, Panel, PanelGroup, Form, FormGroup, FormControl, Button } from 'react-bootstrap';
+import { Grid, Row, Col, Panel, PanelGroup, Form, FormGroup, FormControl, Button, Checkbox } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
 import CurrentMatchView from '../components/CurrentMatchView'
@@ -18,16 +18,20 @@ class AdminView extends Component {
         var matchNameElem = ReactDOM.findDOMNode(this.addMatchName);
         var redTeamsElem = ReactDOM.findDOMNode(this.addRedTeams);
         var blueTeamsElem = ReactDOM.findDOMNode(this.addBlueTeams);
+        var scoreMatchElem = ReactDOM.findDOMNode(this.addScoreMatch);
 
         var matchName = matchNameElem.value;
         var redTeams = redTeamsElem.value.split(';');
         var blueTeams = blueTeamsElem.value.split(';');
+        var shouldScoreMatch = scoreMatchElem.checked;
+
         // Add the match and clear out the values
-        this.props.addMatch(matchName, redTeams, blueTeams);
+        this.props.addMatch(matchName, redTeams, blueTeams, shouldScoreMatch);
 
         matchNameElem.value = "";
         redTeamsElem.value = "";
         blueTeamsElem.value = "";
+        scoreMatchElem.checked = true;
     }
 
     handleAddTeam() {
@@ -109,6 +113,10 @@ class AdminView extends Component {
                                         <FormControl ref={(input) => { this.addBlueTeams = input; }} type="text" placeholder="Blue Teams"/>
                                     </FormGroup>
                                     {' '}
+                                    <FormGroup>
+                                        <Checkbox ref={(input) => { this.addScoreMatch = input; }} checked>Score Match</Checkbox>
+                                    </FormGroup>
+                                    {' '}
                                     <Button bsStyle="primary" onClick={(e) => this.handleAddMatch() }>Add Match</Button>
                                 </Form>
                             </Panel>
@@ -134,8 +142,8 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        addMatch: (matchName, redTeams, blueTeams) => {
-            dispatch(addMatch(matchName, redTeams, blueTeams));
+        addMatch: (matchName, redTeams, blueTeams, shouldScore) => {
+            dispatch(addMatch(matchName, redTeams, blueTeams, shouldScore));
         },
         addTeam: (teamId, teamName) => {
             dispatch(addTeam(teamId, teamName));

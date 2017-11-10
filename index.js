@@ -35,7 +35,8 @@ const Match = sequelize.define('match', {
     blueTeleopScore: Sequelize.INTEGER,
     blueOthersScore: Sequelize.INTEGER,
     blueFouls: Sequelize.INTEGER,
-    blueTechFouls: Sequelize.INTEGER
+    blueTechFouls: Sequelize.INTEGER,
+    shouldScore: Sequelize.BOOLEAN
 });
 
 const MatchRole = sequelize.define('matchRole', {
@@ -80,7 +81,7 @@ console.log('=== Connecting to Database ===');
 sequelize
 .authenticate()
 .then(() => {
-    sequelize.sync().then(() => {
+    sequelize.sync({force:true}).then(() => {
         // Extract the data we need first, then build state and sync with the DB
         var teamList = {};
         var matchList = [];
@@ -142,7 +143,8 @@ sequelize
                         }
                     },
                     redTeams: ['EMPTY', 'EMPTY'],
-                    blueTeams: ['EMPTY', 'EMPTY']
+                    blueTeams: ['EMPTY', 'EMPTY'],
+                    shouldScore: matchInfo.shouldScore
                 };
 
                 // Match the teams!
@@ -173,7 +175,7 @@ sequelize
             tournamentManager.populate(teamList, matchList);
 
             // Hook up additional events
-            tournamentManager.on('addMatch', (matchObj, redTeams, blueTeams) => {
+            tournamentManager.on('addMatch', (matchObj, redTeams, blueTeams, shouldScore) => {
                 // Create the match
                 Match.create({
                     id: matchObj.matchName,
@@ -188,6 +190,7 @@ sequelize
                     blueOthersScore: 0,
                     blueFouls: 0,
                     blueTechFouls: 0,
+                    shouldScore: shouldScore
                 });
 
                 // Create the match roles

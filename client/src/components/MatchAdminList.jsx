@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, ButtonToolbar } from 'react-bootstrap';
+import { Table, Button, ButtonToolbar, Glyphicon } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
 import {setActiveMatch, deleteMatch} from '../actions/matchActions';
@@ -21,7 +21,7 @@ class MatchAdminList extends Component {
         var canActivate = !this.props.activeMatch;
 
         if (matchList.length === 0) {
-            matchListElements = (<tr><td colSpan="7" style={{textAlign: "center"}}>No Matches Listed</td></tr>);
+            matchListElements = (<tr><td colSpan="8" style={{textAlign: "center"}}>No Matches Listed</td></tr>);
         }
         else {
             matchListElements = matchList.map((matchInfo) => {
@@ -36,6 +36,7 @@ class MatchAdminList extends Component {
                         <td className="red-team">{matchInfo.redTeams[1] || 'EMPTY'}</td>
                         <td className="blue-team">{matchInfo.blueTeams[0] || 'EMPTY'}</td>
                         <td className="blue-team">{matchInfo.blueTeams[1] || 'EMPTY'}</td>
+                        <td><Glyphicon glyph={matchInfo.shouldScore ? 'ok':'remove'}/></td>
                         <td>
                             <ButtonToolbar>
                                 <Button onClick={(e) => {this.onDeleteEvent(matchInfo.matchName)}} disabled={deleteBtnDisabled} bsStyle="danger" bsSize="xsmall">Delete</Button>
@@ -55,6 +56,7 @@ class MatchAdminList extends Component {
                         <th>State</th>
                         <th colSpan={2} className='red-team'>Red Teams</th>
                         <th colSpan={2} className='blue-team'>Blue Teams</th>
+                        <th>Scored</th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
