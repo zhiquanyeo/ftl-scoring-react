@@ -31,8 +31,23 @@ class TournamentManager extends EventEmitter {
         this.d_currentMatchScore = null;
         // Immediately init the score
         this.resetCurrentMatchScore();
+    }
 
+    /**
+     * Pre-populates the teams and matches, and updates all clients
+     * @param {*} teamMap 
+     * @param {*} matchList 
+     */
+    populate(teamMap, matchList) {
+        this.d_teams = teamMap;
+        this.d_matches = matchList;
+        this.d_matchNameMap = {};
+        for (var i = 0; i < matchList.length; i++) {
+            this.d_matchNameMap[matchList[i].matchName] = true;
+        }
 
+        this.broadcast('TOURNAMENT_INFO_UPDATED', buildTournamentInfo(this.d_activeMatch, this.d_matches));
+        this.broadcast('TEAM_LIST_UPDATED', this.d_teams);
     }
 
     resetCurrentMatchScore() {
