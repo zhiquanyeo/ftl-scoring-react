@@ -14,11 +14,9 @@ import {addTeam, deleteTeam} from '../actions/teamActions';
 
 class AdminView extends Component {
     handleAddMatch() {
-        console.log('this.props ', this.props);
         var matchNameElem = ReactDOM.findDOMNode(this.addMatchName);
         var redTeamsElem = ReactDOM.findDOMNode(this.addRedTeams);
         var blueTeamsElem = ReactDOM.findDOMNode(this.addBlueTeams);
-        console.log('Match Name: ', matchNameElem.value);
 
         var matchName = matchNameElem.value;
         var redTeams = redTeamsElem.value.split(';');
@@ -49,7 +47,6 @@ class AdminView extends Component {
     }
 
     render() {
-        console.log(this.props);
         var activeMatch = MatchUtil.getActiveMatch(this.props.tournamentInfo);
         
         return (
@@ -106,7 +103,6 @@ class AdminView extends Component {
 };
 
 const mapStateToProps = (state, props) => {
-    console.log('hi ', state);
     return {
         tournamentInfo: {
             activeMatch: state.matchInfo.activeMatch,

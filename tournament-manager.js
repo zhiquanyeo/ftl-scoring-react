@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+const Moniker = require('moniker');
 
 function buildResponse(req) {
     return {
@@ -71,9 +72,14 @@ class TournamentManager extends EventEmitter {
         // General Request message
         socket.on('request', this.handleRequest.bind(this, socket));
 
+        var id = Moniker.choose();
+
+        socket.emit('REGISTRATION', id);
+
         // Send the new clients a status update
         socket.emit('TOURNAMENT_INFO_UPDATED', buildTournamentInfo(this.d_activeMatch, this.d_matches));
         socket.emit('TEAM_LIST_UPDATED', this.d_teams);
+        socket.emit('CURRENT_MATCH_POINTS_UPDATED', this.d_currentMatchScore);
     }
 
     unregisterClient (socket) {
@@ -100,6 +106,7 @@ class TournamentManager extends EventEmitter {
             } break;
             case 'SET_ACTIVE_MATCH': {
                 resp = this.handleSetActiveMatch(req, socket);
+                console.log('set active match resp: ', resp);
             } break;
             case 'UPDATE_AUTO_POINTS': {
                 resp = this.handleUpdateAutoPoints(req, socket);
@@ -162,7 +169,24 @@ class TournamentManager extends EventEmitter {
                 var matchObj = {
                     matchName: req.payload.matchName,
                     redTeams: redTeamNames,
-                    blueTeams: blueTeamNames
+                    blueTeams: blueTeamNames,
+                    scores: {
+                        red: {
+                            auto: 0,
+                            teleop: 0,
+                            others: 0,
+                            fouls: 0,
+                            techFouls: 0
+                        },
+                        blue: {
+                            auto: 0,
+                            teleop: 0,
+                            others: 0,
+                            fouls: 0,
+                            techFouls: 0
+                        }
+                    },
+                    state: 'PRE_START'
                 }
                 this.d_matches.push(matchObj);
                 this.d_matchNameMap[req.payload.matchName] = true;
@@ -248,12 +272,14 @@ class TournamentManager extends EventEmitter {
 
     handleUpdateAutoPoints(req, socket) {
         var resp = buildResponse(req);
-
         // build the points per side
         // baseline = 1, penalty = 3, goal = 5
         // verify that the match name is correct
         var side = req.payload.side;
-        if (req.payload.matchName !== this.d_activeMatch.matchName) {
+        if (!req.payload.matchName) {
+            resp.err = "No match selected";
+        }
+        else if (req.payload.matchName !== this.d_activeMatch) {
             resp.err = "Scoring request received for incorrect match '" + req.payload.matchName + "'";
         }
         else if (side !== 'red' && side !== 'blue') {
@@ -294,6 +320,27 @@ class TournamentManager extends EventEmitter {
 
     handleAddTeleopPoints(req, socket) {
         var resp = buildResponse(req);
+
+        var side = req.payload.side;
+        if (!req.payload.matchName) {
+            resp.err = "No match selected";
+        }
+        else if (req.payload.matchName !== this.d_activeMatch) {
+            resp.err = "Scoring request received for incorrect match '" + req.payload.matchName + "'";
+        }
+        else if (side !== 'red' && side !== 'blue') {
+            resp.err = "Invalid side '" + req.payload.side + "'";
+        }
+        else {
+            // type and points
+            var currTypeScore = this.d_currentMatchScore.points[side][req.payload.type];
+            currTypeScore += req.payload.points;
+            this.d_currentMatchScore.points[side][req.payload.type] = currTypeScore;
+        }
+
+        resp.payload = this.d_currentMatchScore;
+
+        socket.broadcast.emit('CURRENT_MATCH_POINTS_UPDATED', resp.payload);
 
         return resp;
     }

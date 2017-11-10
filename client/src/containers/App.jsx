@@ -9,9 +9,6 @@ import Rankings from './Rankings';
 import ScoringPanel from './ScoringPanel'; 
 
 class App extends Component {
-    constructor(props) {
-        super(props);
-    }
     render () {
         return(
             <Switch>

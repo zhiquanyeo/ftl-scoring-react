@@ -39,8 +39,11 @@ export default(state = initialState, action) => {
             console.log('ADD_TELEOP_POINTS: ', payload);
             return state;
         case CURRENT_MATCH_POINTS_UPDATED:
-            console.log('CURRENT_MATCH_POINTS_UPDATED: ', payload);
-            return state;
+            return {
+                ...state,
+                points: payload.points
+            }
+        // Probably don't need this one
         case CURRENT_MATCH_AUTO_POINTS_UPDATED:
             console.log('CURRENT_MATCH_AUTO_POINTS_UPDATED: ', payload);
             return state;

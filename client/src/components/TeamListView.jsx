@@ -7,7 +7,6 @@ class TeamListView extends Component {
     }
 
     render() {
-        console.log(this.props);
         var teamList = this.props.teamList || {};
 
         var teamListElements;

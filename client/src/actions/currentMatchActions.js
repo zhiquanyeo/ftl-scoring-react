@@ -47,8 +47,10 @@ const _updateAutoPoints = (matchName, side, points, reporter) => {
 };
 export const updateAutoPoints = (matchName, side, points, reporter) => {
     return (dispatch, getState) => {
-        request(_updateAutoPoints(matchName, side, points))
+        console.log('sending request to updateAutoPoints ', points);
+        request(_updateAutoPoints(matchName, side, points, reporter))
         .then((resp) => {
+            console.log('after request, resp: ', resp);
             // Return value is a CurrMatchPoints struct
             dispatch(currentMatchPointsUpdated(resp.matchName, resp.points));
         })
@@ -74,8 +76,12 @@ export const addTeleopPoints = (matchName, side, type, points, reporter) => {
     return (dispatch, getState) => {
         request(_addTeleopPoints(matchName, side, type, points, reporter))
         .then((resp) => {
+            console.log('resp: ', resp);
             // Return value is a CurrMatchPoints struct
             dispatch(currentMatchPointsUpdated(resp.matchName, resp.points));
+        })
+        .catch((err) => {
+            console.log('error: ', err);
         });
     }
 }

@@ -1,4 +1,3 @@
-import Promise from 'promise';
 import ee from 'event-emitter';
 import IO from 'socket.io-client';
 
@@ -14,6 +13,10 @@ class API {
         });
 
         // Out of band comms
+        this.socket.on('REGISTRATION', (id) => {
+            this.emit('REGISTRATION', id);
+        });
+
         this.socket.on('TOURNAMENT_INFO_UPDATED', (tInfo) => {
             this.emit('TOURNAMENT_INFO_UPDATED', tInfo);
         });
@@ -21,11 +24,17 @@ class API {
         this.socket.on('TEAM_LIST_UPDATED', (teamList) => {
             this.emit('TEAM_LIST_UPDATED', teamList);
         });
+
+        this.socket.on('CURRENT_MATCH_POINTS_UPDATED', (scores) => {
+            this.emit('CURRENT_MATCH_POINTS_UPDATED', scores);
+        });
+
+        this.socket.on('CURRENT_MATCH_AUTO_POINTS_UPDATED', (scores) => {
+            this.emit('CURRENT_MATCH_AUTO_POINTS_UPDATED', scores);
+        });
     }
 
     send(topic, id, channel, data) {
-        var respData = {};
-        
         this.socket.emit(topic, {
             channel: channel,
             messageId: id,

@@ -8,7 +8,6 @@ const TournamentManager = require('./tournament-manager');
 const tournamentManager = new TournamentManager();
 
 io.on('connection', (socket) => {
-    console.log('socket conencted');
     tournamentManager.registerClient(socket);
 });
 
