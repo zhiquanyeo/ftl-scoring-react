@@ -3,6 +3,17 @@ import { Grid, Row, Col, Table } from 'react-bootstrap';
 import { connect } from 'react-redux';
 
 function compareTeamRank(a, b) {
+    var aRankScore = 0;
+    var bRankScore = 0;
+    if (a.numMatchesPlayed > 0) {
+        aRankScore = (a.rankingPoints / a.numMatchesPlayed).toFixed(2);
+    }
+    if (b.numMatchesPlayed > 0) {
+        bRankScore = (b.rankingPoints / b.numMatchesPlayed).toFixed(2);
+    }
+    if (aRankScore !== bRankScore) {
+        return bRankScore - aRankScore;
+    }
     return b.score - a.score;
 }
 
@@ -19,7 +30,12 @@ class RankingList extends Component {
             var teamObj = {
                 id: id,
                 name: teamList[id],
-                score: 0
+                score: 0,
+                rankingPoints: 0,
+                numMatchesPlayed: 0,
+                win: 0,
+                loss: 0,
+                tie: 0
             };
 
             idToScoredTeamMap[id] = teamObj;
@@ -31,7 +47,7 @@ class RankingList extends Component {
         })
 
         if (scoredTeamList.length === 0) {
-            matchListElements = (<tr><td colSpan={3} style={{textAlign: "center"}}>No Teams</td></tr>);
+            matchListElements = (<tr><td colSpan={7} style={{textAlign: "center"}}>No Teams</td></tr>);
         }
         else {
             // Calculate the points
@@ -41,7 +57,11 @@ class RankingList extends Component {
                 if (!matchInfo.shouldScore) {
                     continue;
                 }
-                
+
+                if (matchInfo.state !== 'COMPLETE') {
+                    continue;
+                }
+
                 var redTeams = matchInfo.redTeams;
                 var blueTeams = matchInfo.blueTeams;
                 var redScores = matchInfo.scores.red;
@@ -53,14 +73,40 @@ class RankingList extends Component {
                 for (var j = 0; j < redTeams.length; j++) {
                     var teamId = teamNameToId[redTeams[j]];
                     if (teamId !== undefined) {
-                        idToScoredTeamMap[teamId].score += redScoreVal;
+                        var teamObj = idToScoredTeamMap[teamId];
+                        teamObj.score += redScoreVal;
+                        teamObj.numMatchesPlayed++;
+                        if (redScoreVal === blueScoreVal) {
+                            teamObj.rankingPoints++;
+                            teamObj.tie++;
+                        }
+                        else if (redScoreVal > blueScoreVal) {
+                            teamObj.rankingPoints += 2
+                            teamObj.win++;
+                        }
+                        else {
+                            teamObj.loss++;
+                        }
                     }
                 }
 
                 for (var j = 0; j < blueTeams.length; j++) {
                     var teamId = teamNameToId[blueTeams[j]];
                     if (teamId !== undefined) {
-                        idToScoredTeamMap[teamId].score += blueScoreVal;
+                        var teamObj = idToScoredTeamMap[teamId];
+                        teamObj.score += blueScoreVal;
+                        teamObj.numMatchesPlayed++;
+                        if (redScoreVal === blueScoreVal) {
+                            teamObj.rankingPoints++;
+                            teamObj.tie++;
+                        }
+                        else if (blueScoreVal > redScoreVal) {
+                            teamObj.rankingPoints += 2
+                            teamObj.win++;
+                        }
+                        else {
+                            teamObj.loss++;
+                        }
                     }
                 }
             }
@@ -69,11 +115,22 @@ class RankingList extends Component {
             scoredTeamList.sort(compareTeamRank);
 
             matchListElements = scoredTeamList.map((team, idx) => {
+                var rankScore = 0;
+                if (team.numMatchesPlayed > 0) {
+                    rankScore = (team.rankingPoints / team.numMatchesPlayed).toFixed(2);
+                }
+
+                var record = team.win + '-' + team.loss + '-' + team.tie;
+
                 return (
                     <tr key={team.id}>
                         <td>{idx+1}</td>
                         <td>{team.name}</td>
+                        <td>{rankScore}</td>
                         <td>{team.score}</td>
+                        <td>{record}</td>
+                        <td>{team.numMatchesPlayed}</td>
+                        <td>{team.rankingPoints}</td>
                     </tr>
                 )
             });
@@ -89,7 +146,11 @@ class RankingList extends Component {
                                 <tr>
                                     <th>Rank</th>
                                     <th>Team Name</th>
-                                    <th>Points</th>
+                                    <th>Ranking Score</th>
+                                    <th>Match Points</th>
+                                    <th>Record (W-L-T)</th>
+                                    <th>Played</th>
+                                    <th>Total Ranking Points</th>
                                 </tr>
                             </thead>
                             <tbody>
