@@ -13,6 +13,7 @@ class MatchList extends Component {
         }
         else {
             matchListElements = matchList.map((matchInfo) => {
+                console.log(matchInfo);
                 var scores = ScoreUtil.calculateScores(matchInfo);
                 var activeClassName = (matchInfo.matchName === this.props.activeMatch) ? "active-match" : null;
                 return (
@@ -60,7 +61,8 @@ class MatchList extends Component {
 const mapStateToProps = (state, props) => {
     return {
         activeMatch: state.matchInfo.activeMatch,
-        matchList: state.matchInfo.matchList
+        matchList: state.matchInfo.matchList,
+        scores: state.currentMatch.points
     }
 }
 

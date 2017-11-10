@@ -115,16 +115,14 @@ class ScoringPanel extends Component {
         if (this.props.activeMatch) {
             matchName = this.props.activeMatch;
             
-            // if (this.props.matchInfo.state === "AUTO" ||
-            //     this.props.matchInfo.state === "AUTO_COMPLETE") {
-            //     autoButtonsDisabled = false;
-            // }
+            if (this.props.matchInfo.state === "AUTO" ||
+                this.props.matchInfo.state === "AUTO_COMPLETE") {
+                autoButtonsDisabled = false;
+            }
 
-            // if (this.props.matchInfo.state === "TELEOP") {
-            //     teleopButtonsDisabled = false;
-            // }
-            autoButtonsDisabled = false;
-            teleopButtonsDisabled = false;
+            if (this.props.matchInfo.state === "TELEOP") {
+                teleopButtonsDisabled = false;
+            }
             
             var teamArray = this.props.matchInfo[team + 'Teams'];
             team1Name = teamArray[0] || "EMPTY";

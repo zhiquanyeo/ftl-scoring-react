@@ -215,6 +215,7 @@ class TournamentManager extends EventEmitter {
             for (var i = 0; i < this.d_matches.length; i++) {
                 if (this.d_matches[i].matchName === req.payload.matchName) {
                     matchInfo = this.d_matches[i];
+                    break;
                 }
             }
 
@@ -290,6 +291,14 @@ class TournamentManager extends EventEmitter {
             resp.err = "Invalid side '" + req.payload.side + "'";
         }
         else {
+            var matchInfo;
+            for (var i = 0; i < this.d_matches.length; i++) {
+                if (this.d_matches[i].matchName === req.payload.matchName) {
+                    matchInfo = this.d_matches[i];
+                    break;
+                }
+            }
+
             // We only care about the sides
             var pointVal = 0;
             for (var i = 0; i < req.payload.points.length; i++) {
@@ -303,6 +312,10 @@ class TournamentManager extends EventEmitter {
             this.d_currentMatchScore.points[side].auto = pointVal;
             this.d_currentMatchScore.points[side].autoBreakdown = req.payload.points;
 
+            // Also update the corresponding entry in the main match list
+            if (matchInfo) {
+                matchInfo.scores[side].auto = pointVal;
+            }
         }
 
         // Build the payload, which is a score object
@@ -310,6 +323,9 @@ class TournamentManager extends EventEmitter {
 
         // Broadcast
         socket.broadcast.emit('CURRENT_MATCH_POINTS_UPDATED', resp.payload);
+
+        // Also send tournament update
+        this.broadcast('TOURNAMENT_INFO_UPDATED', buildTournamentInfo(this.d_activeMatch, this.d_matches));
 
         // Also send the auto points stuff
         socket.broadcast.emit('CURRENT_MATCH_AUTO_POINTS_UPDATED', {
@@ -340,11 +356,24 @@ class TournamentManager extends EventEmitter {
             var currTypeScore = this.d_currentMatchScore.points[side][req.payload.type];
             currTypeScore += req.payload.points;
             this.d_currentMatchScore.points[side][req.payload.type] = currTypeScore;
+
+            var matchInfo;
+            for (var i = 0; i < this.d_matches.length; i++) {
+                if (this.d_matches[i].matchName === req.payload.matchName) {
+                    matchInfo = this.d_matches[i];
+                    break;
+                }
+            }
+
+            if (matchInfo) {
+                matchInfo.scores[side][req.payload.type] = currTypeScore;
+            }
         }
 
         resp.payload = this.d_currentMatchScore;
 
         socket.broadcast.emit('CURRENT_MATCH_POINTS_UPDATED', resp.payload);
+        this.broadcast('TOURNAMENT_INFO_UPDATED', buildTournamentInfo(this.d_activeMatch, this.d_matches));
 
         return resp;
     }

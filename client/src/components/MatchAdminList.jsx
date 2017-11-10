@@ -23,6 +23,7 @@ class MatchAdminList extends Component {
             matchListElements = matchList.map((matchInfo) => {
                 var activeClassName = (matchInfo.matchName === this.props.activeMatch) ? "active-match" : null;
                 var btnDisabled = !canActivate && matchInfo.state !== 'PRE_START';
+                var deleteBtnDisabled = matchInfo.state !== 'PRE_START';
                 return (
                     <tr key={matchInfo.matchName} className={activeClassName}>
                         <td>{matchInfo.matchName}</td>
@@ -33,7 +34,7 @@ class MatchAdminList extends Component {
                         <td className="blue-team">{matchInfo.blueTeams[1] || 'EMPTY'}</td>
                         <td>
                             <ButtonToolbar>
-                                <Button bsStyle="danger" bsSize="xsmall">Delete</Button>
+                                <Button disabled={btnDisabled} bsStyle="danger" bsSize="xsmall">Delete</Button>
                                 <Button disabled={btnDisabled} bsStyle="success" bsSize="xsmall" onClick={(e) => this.onActivateEvent(matchInfo.matchName)}>Activate</Button>
                             </ButtonToolbar>
                         </td>
