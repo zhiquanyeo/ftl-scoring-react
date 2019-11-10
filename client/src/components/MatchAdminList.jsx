@@ -28,6 +28,10 @@ class MatchAdminList extends Component {
                 var activeClassName = (matchInfo.matchName === this.props.activeMatch) ? "active-match" : null;
                 var btnDisabled = !canActivate && matchInfo.state !== 'PRE_START';
                 var deleteBtnDisabled = matchInfo.state !== 'PRE_START' || matchInfo.matchName === this.props.activeMatch;
+
+                // Always allow deletions
+                deleteBtnDisabled = false;
+
                 return (
                     <tr key={matchInfo.matchName} className={activeClassName}>
                         <td>{matchInfo.matchName}</td>
