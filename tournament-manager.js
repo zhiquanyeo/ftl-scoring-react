@@ -35,8 +35,8 @@ class TournamentManager extends EventEmitter {
 
     /**
      * Pre-populates the teams and matches, and updates all clients
-     * @param {*} teamMap 
-     * @param {*} matchList 
+     * @param {*} teamMap
+     * @param {*} matchList
      */
     populate(teamMap, matchList) {
         this.d_teams = teamMap;
@@ -262,7 +262,7 @@ class TournamentManager extends EventEmitter {
 
     handleSetActiveMatch(req, socket) {
         var resp = buildResponse(req);
-        
+
         // Make sure this is a legit match
         if (this.d_activeMatch !== req.payload.matchName) {
             var matchInfo;
@@ -363,8 +363,8 @@ class TournamentManager extends EventEmitter {
             for (var i = 0; i < req.payload.points.length; i++) {
                 var pointEntry = req.payload.points[i];
                 pointVal += (pointEntry.baseline ? 1 : 0) +
-                            (pointEntry.penalty ? 3 : 0) +
-                            (pointEntry.goal ? 5: 0);
+                            (pointEntry.penalty ? 2 : 0) +
+                            (pointEntry.goal ? 6: 0);
             }
 
             // Update the current match score
@@ -411,6 +411,13 @@ class TournamentManager extends EventEmitter {
             resp.err = "Invalid side '" + req.payload.side + "'";
         }
         else {
+            // Change for 2019
+            // teleop scores go to the OTHER team
+            if (req.payload.type === "teleop") {
+                if (side === "red") side = "blue";
+                else side = "red";
+            }
+
             // type and points
             var currTypeScore = this.d_currentMatchScore.points[side][req.payload.type];
             currTypeScore += req.payload.points;
@@ -439,7 +446,7 @@ class TournamentManager extends EventEmitter {
 
     handleAddAdjustmentPoints(req, socket) {
         var resp = buildResponse(req);
-        
+
         var side = req.payload.side;
         if (!req.payload.matchName) {
             resp.err = "No match selected";
@@ -454,7 +461,7 @@ class TournamentManager extends EventEmitter {
             var currOthersScore = this.d_currentMatchScore.points[side].others;
             currOthersScore += req.payload.points;
             this.d_currentMatchScore.points[side].others = currOthersScore;
-            
+
             var matchInfo;
             for (var i = 0; i < this.d_matches.length; i++) {
                 if (this.d_matches[i].matchName === req.payload.matchName) {
@@ -501,7 +508,7 @@ class TournamentManager extends EventEmitter {
 
     handleStartMatchMode(req, socket) {
         var resp = buildResponse(req);
-        
+
         if (!req.payload.matchName) {
             resp.err = "No match selected";
         }
@@ -526,14 +533,14 @@ class TournamentManager extends EventEmitter {
                     console.log('Match ' + matchInfo.matchName + ' starting AUTO');
                     // Start autonomous mode
                     matchInfo.state = 'AUTO';
-                    
+
                     // Start the timer
                     var currTime = Date.now();
                     var autoInterval = setInterval(() => {
                         var nowTime = Date.now();
                         var timeElapsedSec = Math.floor((nowTime - currTime) / 1000);
-                        var timeRemaining = 210 - timeElapsedSec; // this is what we send down
-                        
+                        var timeRemaining = 150 - timeElapsedSec; // this is what we send down
+
                         this.broadcast('CURRENT_MATCH_TIME_REMAINING_UPDATED', {
                             matchName: matchInfo.matchName,
                             timeRemaining: timeRemaining
@@ -544,7 +551,7 @@ class TournamentManager extends EventEmitter {
                             this.broadcast('TOURNAMENT_INFO_UPDATED', buildTournamentInfo(this.d_activeMatch, this.d_matches));
                             this.broadcast('CURRENT_MATCH_TIME_REMAINING_UPDATED', {
                                 matchName: matchInfo.matchName,
-                                timeRemaining: 180
+                                timeRemaining: 120
                             });
 
                             console.log('AUTO complete');
@@ -553,7 +560,7 @@ class TournamentManager extends EventEmitter {
 
                     resp.payload = {
                         matchName: matchInfo.matchName,
-                        timeRemaining: 210
+                        timeRemaining: 150
                     };
                 }
                 else if (req.payload.mode === 'teleop') {
@@ -565,13 +572,13 @@ class TournamentManager extends EventEmitter {
                     var teleopInterval = setInterval(() => {
                         var nowTime = Date.now();
                         var timeElapsedSec = Math.floor((nowTime - currTime) / 1000);
-                        var timeRemaining = 180 - timeElapsedSec; // this is what we send down
-                        
+                        var timeRemaining = 120 - timeElapsedSec; // this is what we send down
+
                         this.broadcast('CURRENT_MATCH_TIME_REMAINING_UPDATED', {
                             matchName: matchInfo.matchName,
                             timeRemaining: timeRemaining
                         });
-                        if (timeElapsedSec >= 180) {
+                        if (timeElapsedSec >= 120) {
                             clearInterval(teleopInterval);
                             matchInfo.state = 'COMPLETE';
                             this.broadcast('TOURNAMENT_INFO_UPDATED', buildTournamentInfo(this.d_activeMatch, this.d_matches));
@@ -585,7 +592,7 @@ class TournamentManager extends EventEmitter {
 
                     resp.payload = {
                         matchName: matchInfo.matchName,
-                        timeRemaining: 180
+                        timeRemaining: 120
                     };
                 }
 

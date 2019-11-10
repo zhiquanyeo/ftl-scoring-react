@@ -30,14 +30,14 @@ class MatchList extends Component {
             var points = this.props.scores;
             redScore = points.red.auto + points.red.teleop + points.red.others + points.blue.fouls + points.blue.techFouls;
             blueScore = points.blue.auto + points.blue.teleop + points.blue.others + points.red.fouls + points.red.techFouls;
-            
+
             redFouls = points.red.fouls;
             redTechFouls = points.red.techFouls;
             blueFouls = points.blue.fouls;
             blueTechFouls = points.blue.techFouls;
 
             timeRemaining = this.props.timeRemaining;
-            timerBarPct = ((210 - timeRemaining) / 210) * 100;
+            timerBarPct = ((150 - timeRemaining) / 150) * 100;
             if (this.props.matchInfo.state === 'AUTO' ||
                 this.props.matchInfo.state === 'AUTO_COMPLETE') {
                 timerBarStyle = 'info';

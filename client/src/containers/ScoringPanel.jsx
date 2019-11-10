@@ -9,7 +9,7 @@ class ScoringPanel extends Component {
         super(props);
 
         var team = null;
-        if (this.props.match && this.props.match.params && 
+        if (this.props.match && this.props.match.params &&
             this.props.match.params.team) {
             team = this.props.match.params.team.toLowerCase();
         }
@@ -20,13 +20,13 @@ class ScoringPanel extends Component {
             this.state = {
                 autoScores: [
                     {
-                        baseline: autoScores[0].baseline, 
-                        penalty: autoScores[0].penalty, 
+                        baseline: autoScores[0].baseline,
+                        penalty: autoScores[0].penalty,
                         goal: autoScores[0].goal
                     },
                     {
-                        baseline: autoScores[1].baseline, 
-                        penalty: autoScores[1].penalty, 
+                        baseline: autoScores[1].baseline,
+                        penalty: autoScores[1].penalty,
                         goal: autoScores[1].goal
                     },
                 ],
@@ -44,7 +44,7 @@ class ScoringPanel extends Component {
 
     handleAutoScoreClick(teamNum, scoreType) {
         var team = null;
-        if (this.props.match && this.props.match.params && 
+        if (this.props.match && this.props.match.params &&
             this.props.match.params.team) {
             team = this.props.match.params.team;
         }
@@ -69,7 +69,7 @@ class ScoringPanel extends Component {
 
     handleTeleopScoring(scoreType, pointVal) {
         var team = null;
-        if (this.props.match && this.props.match.params && 
+        if (this.props.match && this.props.match.params &&
             this.props.match.params.team) {
             team = this.props.match.params.team.toLowerCase();
         }
@@ -79,7 +79,7 @@ class ScoringPanel extends Component {
 
     render() {
         var team = null;
-        if (this.props.match && this.props.match.params && 
+        if (this.props.match && this.props.match.params &&
             this.props.match.params.team) {
             team = this.props.match.params.team;
         }
@@ -103,18 +103,18 @@ class ScoringPanel extends Component {
         var team1AutoBaselineChecked = false;
         var team1AutoPenaltyChecked = false;
         var team1AutoGoalChecked = false;
-        
+
 
         var team2AutoBaselineChecked = false;
         var team2AutoPenaltyChecked = false;
         var team2AutoGoalChecked = false;
-        
+
         var autoButtonsDisabled = true;
         var teleopButtonsDisabled = true;
-        
+
         if (this.props.activeMatch) {
             matchName = this.props.activeMatch;
-            
+
             if (this.props.matchInfo.state === "AUTO" ||
                 this.props.matchInfo.state === "AUTO_COMPLETE") {
                 autoButtonsDisabled = false;
@@ -123,7 +123,7 @@ class ScoringPanel extends Component {
             if (this.props.matchInfo.state === "TELEOP") {
                 teleopButtonsDisabled = false;
             }
-            
+
             var teamArray = this.props.matchInfo[team + 'Teams'];
             team1Name = teamArray[0] || "EMPTY";
             team2Name = teamArray[1] || "EMPTY";
@@ -138,11 +138,11 @@ class ScoringPanel extends Component {
             team2AutoGoalChecked = teamAutoScores[1].goal;
         }
 
-        var team1AutoNoneChecked = !team1AutoBaselineChecked && 
+        var team1AutoNoneChecked = !team1AutoBaselineChecked &&
                                    !team1AutoPenaltyChecked &&
                                    !team1AutoGoalChecked;
 
-        var team2AutoNoneChecked = !team2AutoBaselineChecked && 
+        var team2AutoNoneChecked = !team2AutoBaselineChecked &&
                                    !team2AutoPenaltyChecked &&
                                    !team2AutoGoalChecked;
         return (
@@ -172,9 +172,9 @@ class ScoringPanel extends Component {
                             <Col xs={8}>
                                 <ButtonToolbar>
                                     <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(0, "none")}} bsStyle={team1AutoNoneChecked ? "danger" : null} bsSize="large">None <Glyphicon glyph="remove" /></Button>
-                                    <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(0, "baseline")}} bsStyle={team1AutoBaselineChecked ? "success" : null} bsSize="large">Baseline <Glyphicon glyph="ok" /></Button>
-                                    <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(0, "penalty")}} bsStyle={team1AutoPenaltyChecked ? "success" : null} bsSize="large">Penalty <Glyphicon glyph="ok" /></Button>
-                                    <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(0, "goal")}} bsStyle={team1AutoGoalChecked ? "success" : null} bsSize="large">Goal <Glyphicon glyph="ok" /></Button>
+                                    <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(0, "baseline")}} bsStyle={team1AutoBaselineChecked ? "success" : null} bsSize="large">Neutral Zone <Glyphicon glyph="ok" /></Button>
+                                    <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(0, "penalty")}} bsStyle={team1AutoPenaltyChecked ? "success" : null} bsSize="large">Robot <Glyphicon glyph="ok" /></Button>
+                                    <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(0, "goal")}} bsStyle={team1AutoGoalChecked ? "success" : null} bsSize="large">Drop Target <Glyphicon glyph="ok" /></Button>
                                 </ButtonToolbar>
                             </Col>
                         </Row>
@@ -185,9 +185,9 @@ class ScoringPanel extends Component {
                             <Col xs={8}>
                                 <ButtonToolbar>
                                     <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(1, "none")}} bsStyle={team2AutoNoneChecked ? "danger" : null} bsSize="large">None <Glyphicon glyph="remove" /></Button>
-                                    <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(1, "baseline")}} bsStyle={team2AutoBaselineChecked ? "success" : null} bsSize="large">Baseline <Glyphicon glyph="ok" /></Button>
-                                    <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(1, "penalty")}} bsStyle={team2AutoPenaltyChecked ? "success" : null} bsSize="large">Penalty <Glyphicon glyph="ok" /></Button>
-                                    <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(1, "goal")}} bsStyle={team2AutoGoalChecked ? "success" : null} bsSize="large">Goal <Glyphicon glyph="ok" /></Button>
+                                    <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(1, "baseline")}} bsStyle={team2AutoBaselineChecked ? "success" : null} bsSize="large">Neutral Zone <Glyphicon glyph="ok" /></Button>
+                                    <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(1, "penalty")}} bsStyle={team2AutoPenaltyChecked ? "success" : null} bsSize="large">Robot <Glyphicon glyph="ok" /></Button>
+                                    <Button disabled={autoButtonsDisabled} onClick={(e) => {this.handleAutoScoreClick(1, "goal")}} bsStyle={team2AutoGoalChecked ? "success" : null} bsSize="large">Drop Target <Glyphicon glyph="ok" /></Button>
                                 </ButtonToolbar>
                             </Col>
                         </Row>
@@ -198,7 +198,7 @@ class ScoringPanel extends Component {
                         <h3>Teleop</h3>
                         <Row>
                             <Col xs={12}>
-                                <Button disabled={teleopButtonsDisabled} onClick={(e) => {this.handleTeleopScoring('teleop', 1)}} style={{height: 150}} block bsStyle="success" bsSize="large">GOAL</Button>
+                                <Button disabled={teleopButtonsDisabled} onClick={(e) => {this.handleTeleopScoring('teleop', 1)}} style={{height: 150}} block bsStyle="success" bsSize="large">ROBOT HIT</Button>
                             </Col>
                         </Row>
                         <Row style={{marginTop: 25}}>

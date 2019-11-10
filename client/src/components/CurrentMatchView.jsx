@@ -52,7 +52,7 @@ class CurrentMatchView extends Component {
         var teleopButtonStyle = null;
 
         if (matchInfo.state === 'AUTO') {
-            var autoTimeRemain = this.props.matchTimeRemaining - 180;
+            var autoTimeRemain = this.props.matchTimeRemaining - 120;
             phaseTimer = '00:' + (autoTimeRemain < 10 ? '0':'') + autoTimeRemain;
             autoButtonStyle = 'success';
             teleopButtonStyle = null;
@@ -134,7 +134,7 @@ class CurrentMatchView extends Component {
                         <Button onClick={(e) => {this.handleCommitScores();}} disabled={adjustmentButtonsDisabled} bsStyle="success">Commit Scores</Button>
                     </Col>
                 </Row>
-                
+
             </Grid>
         );
     }
