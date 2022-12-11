@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.2",
+    "express": "^4.17.3",
     "moniker": "^0.1.2",
     "pg": "^7.4.0",
     "sequelize": "^4.22.6",
